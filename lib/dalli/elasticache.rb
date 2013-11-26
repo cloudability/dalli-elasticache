@@ -45,11 +45,9 @@ module Dalli
       # We didn't get raw data back so we're assuming it's not in clustered
       # mode. We'll synthesize our own data out of that.
       if raw_data.empty?
-        raw_stats = stats
-
         instance = { :host => config_host, :ip => resolved_config_host, :port => config_port }
 
-        # TODO: Version should be...anything else.
+        # TODO: Version should be...anything else? Is it significant?
         @data = { :version => 1, :instances => [instance] }
       else
         version = raw_data[1].to_i
