@@ -1,4 +1,5 @@
 require 'dalli'
+require 'resolv'
 require 'socket'
 require 'dalli/elasticache/version'
 
@@ -67,17 +68,15 @@ module Dalli
 
     def resolved_config_host
       # If it's already an IP address, let's not worry 'bout it.
-      return config_host.strip if config_host.strip =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+      return config_host.strip if ipv4?(config_host)
 
-      resolv = Resolv::DNS.new
-      addresses = resolv.getaddresses(config_host)
-      ipv4 = addresses.detect { |addr| addr.is_a?(Resolv::IPv4) }
+      # Try to find an IPv4 addr for this host!
+      hosts = Resolv.getaddresses(config_host)
+      hosts.detect { |str| ipv4?(str) } || config_host
+    end
 
-      if ipv4.nil?
-        raise RuntimeError, "Failed to resolve #{config_host}"
-      end
-
-      ipv4.to_s
+    def ipv4?(str)
+      str.strip =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
     end
   end
 end
