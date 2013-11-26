@@ -30,7 +30,7 @@ module Dalli
       s.puts "config get cluster\r\n"
       data = []
       while (line = s.gets) != "END\r\n"
-        break if data == "ERROR\r\n"
+        break if line == "ERROR\r\n"
         data << line
       end
 
